@@ -1,113 +1,69 @@
-var NES = ee.FeatureCollection("users/reachsyriagee/Admin_Areas/NES")
-var NWS = ee.FeatureCollection("users/reachsyriagee/Admin_Areas/NWS_dissolved")
-var control_zones = NES.merge(NWS)
+
+// var chartSeries = function(varString, geo, imageCollect, reducer, convertArea) {
+
+//   var title = varString.concat(" Over Time")
+//   if(convertArea){
+//     var scale = getMapScale()
+//     var scaleFactor = scale/10
+
+// var imageCollect = imageCollect.map(
+//       function(image){return image.eq(3).multiply(ee.Image.pixelArea()).copyProperties(image, image.propertyNames())}) // .divide(1000000)
+//   }
+
+//   return ui.Chart.image.series(imageCollect, geo, reducer, 100)
+//       .setOptions({
+//         title: title,
+//         vAxis: {title: varString}, //viewWindow: {minValue: 0, maxValue: 0.7}},
+//         hAxis: { title: 'Time' },
+//         lineWidth: 1,
+//         pointSize: 2,
+//         // maxPixels: 1000000000,
+//         bestEffort: true
+//       })
+// }
 
 
+// exports.chartSeries = chartSeries
 
-var chartSeries_NDVI = function(varString, geo, imageCollect) {
+var chartSeries = function(varString, geo, imageCollect, reducer, convertArea, bars) {
+
   var title = varString.concat(" Over Time")
-    return ui.Chart.image.series(imageCollect, geo, ee.Reducer.mean(), 100)
+  if(convertArea){
+    var scale = getMapScale()
+    var scaleFactor = scale/10
+
+ var imageCollect = imageCollect.map(
+      function(image){return image.eq(3).multiply(ee.Image.pixelArea()).copyProperties(image, image.propertyNames())}) // .divide(1000000)
+  }
+
+  if(bars){
+    return ui.Chart.image.series(imageCollect, geo, reducer, 100)
+      .setOptions({
+        title: title,
+        vAxis: {title: varString}, //viewWindow: {minValue: 0, maxValue: 0.7}},
+        hAxis: { title: 'Time' },
+        // maxPixels: 1000000000,
+        bestEffort: true
+      })
+      .setChartType('ColumnChart')
+
+  }
+  else{
+    return ui.Chart.image.series(imageCollect, geo, reducer, 100)
       .setOptions({
         title: title,
         vAxis: {title: varString}, //viewWindow: {minValue: 0, maxValue: 0.7}},
         hAxis: { title: 'Time' },
         lineWidth: 1,
         pointSize: 2,
-        colors: ["006600"],
         // maxPixels: 1000000000,
         bestEffort: true
       })
-}
-
-exports.chartSeries_NDVI = chartSeries_NDVI
-
-
-
-
-
-var chartSeries_cropland = function(varString, geo, imageCollect) {
-  var title = varString.concat(" Over Time")
-  var imageCollect = imageCollect.map(function(image){return image.multiply(ee.Image.pixelArea()).divide(1000000).copyProperties(image, image.propertyNames())})
-
-    return ui.Chart.image.series(imageCollect, geo, ee.Reducer.sum(), 100)
-      .setOptions({
-        title: title,
-        vAxis: {title: varString,  viewWindow: {min: 0}}, //viewWindow: {minValue: 0, maxValue: 0.7}},
-        hAxis: { title: 'Time' },
-        colors: ["006600"],
-        // maxPixels: 1000000000,
-        bestEffort: true
-      })
-      .setChartType('ColumnChart')
-
-}
-exports.chartSeries_cropland = chartSeries_cropland
-
-
-
-var chartSeries_water = function(varString, geo, imageCollect) {
-  var title = varString.concat(" Over Time")
-  var imageCollect = imageCollect.map(function(image){return image.eq(3).multiply(ee.Image.pixelArea()).copyProperties(image, image.propertyNames())})
-
-    return ui.Chart.image.series(imageCollect, geo, ee.Reducer.sum(), 100)
-      .setOptions({
-        title: title,
-        vAxis: {title: varString, viewWindow: {min: 0}}, //viewWindow: {minValue: 0, maxValue: 0.7}},
-        hAxis: { title: 'Time' },
-        lineWidth: 1,
-        pointSize: 2,
-        colors: ['blue'],
-        // maxPixels: 1000000000,
-        bestEffort: true
-      })
-
-
-}
-exports.chartSeries_water = chartSeries_water
-
-
-var chartSeries_precip = function(varString, geo, imageCollect) {
-  var title = varString.concat(" Over Time")
-    return ui.Chart.image.series(imageCollect, geo, ee.Reducer.mean(), 250)
-      .setOptions({
-        title: title,
-        vAxis: {title: varString}, //viewWindow: {minValue: 0, maxValue: 0.7}},
-        hAxis: { title: 'Time' },
-        colors: ['blue'],
-        // maxPixels: 1000000000,
-        bestEffort: true
-      })
-      .setChartType('ColumnChart')
-
-}
-exports.chartSeries_precip = chartSeries_precip
-
-
-var chartSeries_SPI = function(varString, geo, imageCollect) {
-  var title = varString.concat(" Over Time")
-    return ui.Chart.image.series(imageCollect, geo, ee.Reducer.mean(), 250)
-      .setOptions({
-        title: title,
-        vAxis: {title: varString}, //  viewWindow: {minValue: -4, maxValue: 4} does not work
-        hAxis: { title: 'Time' },
-        colors: ['blue'],
-        // maxPixels: 1000000000,
-        // bestEffort: true
-      })
-      .setChartType('ColumnChart')
+  }
 
 }
 
-exports.chartSeries_SPI = chartSeries_SPI
-
-
-
-
-
-
-
-
-
+exports.chartSeries = chartSeries
 
 
 exports.setPanel1 = function(panel,country, number) {
@@ -283,7 +239,7 @@ exports.getYear=getYear
 // // MONTH SELECT DROPDOWN WIDGET
 var createMonthDropDown = function(endYear, endMonth, collections, visParams, labels, dateYearSelect) {
 
-// var months = ee.List.sequence(1, 12, 1)
+var months = ee.List.sequence(1, 12, 1)
 
 var months = ["1","2","3","4","5","6","7","8","9","10","11","12"]
 
@@ -317,7 +273,7 @@ var years =  ee.List.sequence(startYear, endYear, 1).map(function(number) {
 
 // print(years)
 
-years = ["2017","2018","2019","2020","2021", "2022"]
+years = ["2017","2018","2019","2020","2021"]
 
 var dateYearSelect =  ui.Select({
     items: years,
@@ -484,13 +440,7 @@ var createAndSetLayer = function(feature, key, adm) {
     var layer = ui.Map.Layer(outline, {palette: '202020'}, adm+key, true, 0.9 );
     Map.layers().set(2, layer);
 
-    var layer_2 = ui.Map.Layer(empty.paint({
-      featureCollection: control_zones,
-      color: 1,
-      width: 3
-    }), {}, 'Lines of control', false);
-
-    Map.layers().set(3, layer_2);
+    // Map.addLayer(outline, {palette: 'FF0000'}, 'edges');
 }
 
 exports.createAndSetLayer = createAndSetLayer
@@ -506,30 +456,21 @@ var placeHolder = placeHolders[index]
 var admAreaNames = admFeatures.aggregate_array(admAttributeName).distinct().sort().getInfo()
 
 
-
 var zoomToAdm1 = function(key) {
     var feature = admFeatures.filter(ee.Filter.eq(admAttributeName, key))
     update_widgets(admAttributeNames, placeHolders, level, imageCollects, feature, panel );
     createAndSetLayer(feature, key, "Governorate: ")
     if(imageCollects.length >= 1){
-    var chart = chartSeries_NDVI("NDVI",feature,imageCollects[0])
+    var chart = chartSeries("NDVI",feature,imageCollects[0],ee.Reducer.mean(),false,false)
     panel.widgets().set(6, chart);
     }
     if(imageCollects.length >= 2 ){
-    var chart = chartSeries_cropland("Cropland (km²)",feature,imageCollects[1])
+    var chart = chartSeries("Water (m²)",feature,imageCollects[1],ee.Reducer.sum(),true,false)
     panel.widgets().set(7, chart);
     }
-    if(imageCollects.length >= 3 ){
-    var chart = chartSeries_water("Surface Water (m²)",feature,imageCollects[2])
+    if(imageCollects.length === 3 ){
+    var chart = chartSeries("Precipitation (mm)",feature,imageCollects[2],ee.Reducer.mean(),false,true)
     panel.widgets().set(8, chart);
-    }
-    if(imageCollects.length >= 4 ){
-    var chart = chartSeries_precip("Precipitation (mm)",feature,imageCollects[3])
-    panel.widgets().set(9, chart);
-    }
-    if(imageCollects.length === 5 ){
-    var chart = chartSeries_SPI("SPI",feature,imageCollects[4])
-    panel.widgets().set(10, chart);
     }
 
   }
@@ -540,24 +481,16 @@ var zoomToAdm2 = function(key) {
     update_widgets(admAttributeNames, placeHolders, level, imageCollects, feature, panel );
     createAndSetLayer(feature, key, "District: ")
     if(imageCollects.length >= 1){
-    var chart = chartSeries_NDVI("NDVI",feature,imageCollects[0])
+    var chart = chartSeries("NDVI",feature,imageCollects[0],ee.Reducer.mean(),false,false)
     panel.widgets().set(6, chart);
     }
     if(imageCollects.length >= 2 ){
-    var chart = chartSeries_cropland("Cropland (km²)",feature,imageCollects[1])
+    var chart = chartSeries("Water (m²)",feature,imageCollects[1],ee.Reducer.sum(),true,false)
     panel.widgets().set(7, chart);
     }
-    if(imageCollects.length >= 3 ){
-    var chart = chartSeries_water("Surface Water (m²)",feature,imageCollects[2])
+    if(imageCollects.length === 3 ){
+    var chart = chartSeries("Precipitation (mm)",feature,imageCollects[2],ee.Reducer.mean(),false,true)
     panel.widgets().set(8, chart);
-    }
-    if(imageCollects.length >= 4 ){
-    var chart = chartSeries_precip("Precipitation (mm)",feature,imageCollects[3])
-    panel.widgets().set(9, chart);
-    }
-    if(imageCollects.length === 5 ){
-    var chart = chartSeries_SPI("SPI",feature,imageCollects[4])
-    panel.widgets().set(10, chart);
     }
 }
 
@@ -566,24 +499,16 @@ var zoomToAdm3 = function(key) {
   var feature = admFeatures.filter(ee.Filter.eq(admAttributeName, key))
     createAndSetLayer(feature, key, "Sub-district: ")
      if(imageCollects.length >= 1){
-    var chart = chartSeries_NDVI("NDVI",feature,imageCollects[0])
+    var chart = chartSeries("NDVI",feature,imageCollects[0],ee.Reducer.mean(),false,false)
     panel.widgets().set(6, chart);
     }
     if(imageCollects.length >= 2 ){
-    var chart = chartSeries_cropland("Cropland (km²)",feature,imageCollects[1])
+    var chart = chartSeries("Water (m²)",feature,imageCollects[1],ee.Reducer.sum(),true,false)
     panel.widgets().set(7, chart);
     }
-    if(imageCollects.length >= 3 ){
-    var chart = chartSeries_water("Surface Water (m²)",feature,imageCollects[2])
+    if(imageCollects.length === 3 ){
+    var chart = chartSeries("Precipitation (mm)",feature,imageCollects[2],ee.Reducer.mean(),false,true)
     panel.widgets().set(8, chart);
-    }
-    if(imageCollects.length >= 4 ){
-    var chart = chartSeries_precip("Precipitation (mm)",feature,imageCollects[3])
-    panel.widgets().set(9, chart);
-    }
-    if(imageCollects.length === 5 ){
-    var chart = chartSeries_SPI("SPI",feature,imageCollects[4])
-    panel.widgets().set(10, chart);
     }
 }
 
@@ -674,6 +599,3 @@ drawingTools.layers().add(dummyGeo)
 
 exports.configureDrawingTools = configureDrawingTools
 exports.getMapScale = getMapScale
-
-
- 
